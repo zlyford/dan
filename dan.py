@@ -4,7 +4,7 @@ import sys, wave
 def compare(path1, path2):
     file1 = open_file(path1)
     file2 = open_file(path2)
-    print 'comparing ' + path1 + ' and ' + path2 + '...'
+    print('comparing ' + path1 + ' and ' + path2 + '...')
     # do stuff here
 
 # opens the audio file at the given location
