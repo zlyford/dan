@@ -12,7 +12,7 @@ def open_file(path):
     try:
         audio = wave.open(path)
     except:
-        sys.stderr.write('ERROR: ' + sys.exc_info()[0] + '\n')
+        sys.stderr.write('ERROR: ' + str(sys.exc_info()[0]) + '\n')
         sys.exit(-1)
     return audio
 
