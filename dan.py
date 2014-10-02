@@ -11,6 +11,10 @@ def compare(path1, path2):
     print("File 2: " + file2_info)
     # do stuff here
 
+    # close the files
+    file1.close()
+    file2.close()
+
 # opens the audio file at the given location
 def open_file(path):
     try:
