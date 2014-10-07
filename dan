@@ -1,17 +1,35 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
-import sys, wave
+# for some reason numpy is not installed for python 3 on the CCIS machines...
+import sys, wave, array, numpy
 
+DEBUG = False
 
 def compare(path1, path2):
     file1 = open_file(path1)
     file2 = open_file(path2)
-    file1_info = str(file1.getparams())
-    file2_info = str(file2.getparams())
-    print("File Info:")
-    print("File 1: " + file1_info)
-    print("File 2: " + file2_info)
-    # do stuff here
+    file1_info = file1.getparams()
+    file2_info = file2.getparams()
+    if(DEBUG):
+        print("File Info:")
+        print("File 1: " + str(file1_info))
+        print("File 2: " + str(file2_info))
+    nframes1 = file1_info[3]
+    nframes2 = file2_info[3]
+    # reads the wave file data
+    byte_string1 = file1.readframes(nframes1)
+    byte_string2 = file2.readframes(nframes2)
+    # convert that into an array of ints
+    a1 = array.array('h', byte_string1)
+    a2 = array.array('h', byte_string2)
+    # find the correlation matrix between them
+    if len(a1) == len(a2):
+        corr = numpy.corrcoef(a1, a2)
+        # if the files are pretty similar, return match, otherwise no match
+        if corr[0][1] > 0.9:
+            print("MATCH ")
+        else:
+            print("NO MATCH ")
 
     # close the files
     file1.close()
@@ -21,7 +39,7 @@ def compare(path1, path2):
 def open_file(path):
     try:
         audio = wave.open(path)
-    except:
+    except: # TODO: better exception handling
         sys.stderr.write('ERROR: ' + str(sys.exc_info()[0]) + '\n')
         sys.exit(-1)
     return audio
