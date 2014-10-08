@@ -27,7 +27,7 @@ def compare(path1, path2):
         corr = numpy.corrcoef(a1, a2)
         # if the files are pretty similar, return match, otherwise no match
         if corr[0][1] > 0.9:
-            print("MATCH ")
+            print("MATCH " + path1 + " " + path2)
         else:
             print("NO MATCH ")
 
