@@ -40,6 +40,8 @@ def compare(path1, path2):
             print("MATCH " + path1 + " " + path2)
         else:
             print("NO MATCH ")
+    else:
+        print("NO MATCH ")
 
 
 # opens the audio file at the given location
@@ -54,7 +56,7 @@ def open_file(path):
 
 # Parse arguments
 if __name__ == '__main__':
-    if (len(sys.argv) != 5) or (sys.argv[1] != '-f') or (sys.argv[3] != '-f'):
+    if (len(sys.argv) != 5) or (sys.argv[1] != '-f') or (sys.argv[3] != '-f') or (sys.argv[2] == sys.argv[4]):
         sys.stderr.write('ERROR: incorrect command line\n')
         sys.exit(-1)
     else:
