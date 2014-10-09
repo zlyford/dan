@@ -39,16 +39,20 @@ def compare(path1, path2):
             path2 = get_short_name(path2)
             print("MATCH " + path1 + " " + path2)
         else:
-            print("NO MATCH ")
+            print("NO MATCH")
     else:
-        print("NO MATCH ")
+        print("NO MATCH")
 
 
 # opens the audio file at the given location
 def open_file(path):
-    try:
-        audio = wave.open(path)
-    except:  # TODO: better exception handling
+    if(path.split('.')[-1] == "wav"):
+        try:
+            audio = wave.open(path)
+    	except:  # file could not be opened
+            sys.stderr.write('ERROR: ' + path + ' could not be opened\n')
+            sys.exit(-1)
+    else:  # not a '.wav' file
         sys.stderr.write('ERROR: ' + path + ' is not a supported format\n')
         sys.exit(-1)
     return audio
@@ -56,7 +60,7 @@ def open_file(path):
 
 # Parse arguments
 if __name__ == '__main__':
-    if (len(sys.argv) != 5) or (sys.argv[1] != '-f') or (sys.argv[3] != '-f') or (sys.argv[2] == sys.argv[4]):
+    if (len(sys.argv) != 5) or (sys.argv[1] != '-f') or (sys.argv[3] != '-f'):
         sys.stderr.write('ERROR: incorrect command line\n')
         sys.exit(-1)
     else:
