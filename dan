@@ -8,32 +8,28 @@ import os
 
 import numpy
 
-DEBUG = False
-
 
 # Returns the short name of the file
 def get_short_name(path):
     return os.path.basename(os.path.normpath(path))
 
 
+# process file for comparison; returns array of ints of the wave file samples
+def process_file(path):
+    f = open_file(path)
+    f_info = f.getparams()
+    nframes = f_info[3]
+    # reads the wave file data
+    byte_string = f.readframes(nframes)
+    f.close()
+    # convert that into an array of ints
+    return array.array('h', byte_string)
+
+
 # Main function for comparing two audio files
 def compare(path1, path2):
-    file1 = open_file(path1)
-    file2 = open_file(path2)
-    file1_info = file1.getparams()
-    file2_info = file2.getparams()
-    if(DEBUG):
-        print("File Info:")
-        print("File 1: " + str(file1_info))
-        print("File 2: " + str(file2_info))
-    nframes1 = file1_info[3]
-    nframes2 = file2_info[3]
-    # reads the wave file data
-    byte_string1 = file1.readframes(nframes1)
-    byte_string2 = file2.readframes(nframes2)
-    # convert that into an array of ints
-    a1 = array.array('h', byte_string1)
-    a2 = array.array('h', byte_string2)
+    a1 = process_file(path1)
+    a2 = process_file(path2)
     # find the correlation matrix between them
     if len(a1) == len(a2):
         corr = numpy.corrcoef(a1, a2)
@@ -44,10 +40,6 @@ def compare(path1, path2):
             print("MATCH " + path1 + " " + path2)
         else:
             print("NO MATCH ")
-
-    # close the files
-    file1.close()
-    file2.close()
 
 
 # opens the audio file at the given location
