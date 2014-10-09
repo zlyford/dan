@@ -1,10 +1,22 @@
 #!/usr/bin/python
 
 # for some reason numpy is not installed for python 3 on the CCIS machines...
-import sys, wave, array, numpy
+import sys
+import wave
+import array
+import os
+
+import numpy
 
 DEBUG = False
 
+
+# Returns the short name of the file
+def get_short_name(path):
+    return os.path.basename(os.path.normpath(path))
+
+
+# Main function for comparing two audio files
 def compare(path1, path2):
     file1 = open_file(path1)
     file2 = open_file(path2)
@@ -27,6 +39,8 @@ def compare(path1, path2):
         corr = numpy.corrcoef(a1, a2)
         # if the files are pretty similar, return match, otherwise no match
         if corr[0][1] > 0.9:
+            path1 = get_short_name(path1)
+            path2 = get_short_name(path2)
             print("MATCH " + path1 + " " + path2)
         else:
             print("NO MATCH ")
@@ -35,11 +49,12 @@ def compare(path1, path2):
     file1.close()
     file2.close()
 
+
 # opens the audio file at the given location
 def open_file(path):
     try:
         audio = wave.open(path)
-    except: # TODO: better exception handling
+    except:  # TODO: better exception handling
         sys.stderr.write('ERROR: ' + path + ' is not a supported format\n')
         sys.exit(-1)
     return audio
