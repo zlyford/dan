@@ -36,7 +36,7 @@ If a specified file is in an incorrect format, it will return:
     
 If a file could not be opened for reasons including the file not existing:
     
-    ERROR: <file> is not a supported format
+    ERROR: <file> could not be opened
     
 The program only uses libraries that are included on the CCIS Linux machines
 and does not use any third party external libraries. 
