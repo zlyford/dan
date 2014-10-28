@@ -38,6 +38,7 @@ def compare(path1, path2):
     a1 = process_file(path1)
     a2 = process_file(path2)
     # find the correlation matrix between them
+    # TODO: Find the actual length of the files before comparing
     if len(a1) == len(a2):
         corr = numpy.corrcoef(a1, a2)
         # if the files are pretty similar, return match, otherwise no match
@@ -45,19 +46,17 @@ def compare(path1, path2):
             path1 = get_short_name(path1)
             path2 = get_short_name(path2)
             print("MATCH " + path1 + " " + path2)
-        else:
-            print("NO MATCH ")
 
 
 # opens the audio file at the given location
 def open_file(path):
-    temp_path = os.path.normpath('/tmp/file1.wav')
+    temp_path = os.path.normpath('/tmp/file2325637.wav')
     try:
         audio = wave.open(path)
     except Exception as e:  # it's probably an mp3, so convert it to a temp wav file
         try:
-            subprocess.check_call([lame, '--decode', '--quiet', '--mp3input', path, temp_path])
-        except Exception:
+            subprocess.check_call([lame, '--decode', '--quiet', path, temp_path])
+        except Exception as e:
             sys.stderr.write('ERROR: unsupported format\n')
             sys.exit(-1)
         try:
@@ -83,5 +82,7 @@ if __name__ == '__main__':
             sys.stderr.write('ERROR: invalid directory\n')
             sys.exit(-1)
         for f in file_list:
-            f = sys.argv[4] + '\\' + f
+            f = os.path.join(sys.argv[4], f)
             compare(sys.argv[2], f)
+            
+        
