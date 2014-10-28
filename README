@@ -1,0 +1,42 @@
+CS 4500 Assignment 4
+
+Tianlin Chen (chen.tia@husky.neu.edu)
+Zachary Lyford (lyford.z@husky.neu.edu)
+Michael Ng (ng.mich@husky.neu.edu)
+Cody Orick (orick@ccs.neu.edu)
+
+Rapid prototype of audio matching software for the semester project. 
+
+Usage, from the assignment specification: 
+
+    ./dan -f <pathname> -f <pathname>
+
+where <pathname> is a Linux path name that ends in ".wav" for
+a file that already exists on the CCIS shared file system and
+is in WAVE format with CD-quality parameters (AudioFormat 1,
+stereo, 16 bits per sample, 44.1 kHz sampling rate).
+
+The "dan" file should be executable from the command line without any kind of
+compiling needed. If the two given files match, it will return:
+
+    MATCH <file1> <file2>
+
+where the files are the short file names given in the command. If the files do
+not match, it will return:
+
+    NO MATCH
+
+if an invalid command is given, it will return 
+
+    ERROR: incorrect command line
+
+If a specified file is in an incorrect format, it will return:
+
+    ERROR: <file> is not a supported format
+    
+If a file could not be opened for reasons including the file not existing:
+    
+    ERROR: <file> could not be opened
+    
+The program only uses libraries that are included on the CCIS Linux machines
+and does not use any third party external libraries. 
