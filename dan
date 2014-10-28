@@ -33,11 +33,6 @@ def process_file(path):
     return array.array('h', byte_string)
 
 
-# processes a directory
-def process_directory(path):
-    return True
-
-
 # Main function for comparing two audio files or directories
 def compare(path1, path2):
     a1 = process_file(path1)
