@@ -16,6 +16,7 @@ flags = ['-f', '-d']
 # lame executable location
 lame = os.path.normpath('/course/cs4500f14/bin/lame')
 
+
 # Returns the short name of the file
 def get_short_name(path):
     return os.path.basename(os.path.normpath(path))
@@ -38,7 +39,7 @@ def compare(path1, path2):
     a1 = process_file(path1)
     a2 = process_file(path2)
     # find the correlation matrix between them
-    # TODO: Find the actual length of the files before comparing
+    # TODO: maybe find the actual length of the files before comparing
     if len(a1) == len(a2):
         corr = numpy.corrcoef(a1, a2)
         # if the files are pretty similar, return match, otherwise no match
@@ -84,5 +85,28 @@ if __name__ == '__main__':
         for f in file_list:
             f = os.path.join(sys.argv[4], f)
             compare(sys.argv[2], f)
-            
-        
+    elif sys.argv[1] == '-d' and sys.argv[3] == '-f':  # TODO: probably a better way of doing this
+        try:
+            file_list = os.listdir(sys.argv[2])
+        except OSError:
+            sys.stderr.write('ERROR: invalid directory\n')
+            sys.exit(-1)
+        for f in file_list:
+            f = os.path.join(sys.argv[2], f)
+            compare(sys.argv[4], f)
+    elif sys.argv[1] == '-d' and sys.argv[3] == '-d':  # both are directories
+        try:
+            file_list1 = os.listdir(sys.argv[2])
+        except:
+            sys.stderr.write('ERROR: invalid directory\n')
+            sys.exit(-1)
+        try:
+            file_list2 = os.listdir(sys.argv[4])
+        except:
+            sys.stderr.write('ERROR: invalid directory\n')
+            sys.exit(-1)
+        for f in file_list1:  # TODO: this is probably really inefficient
+            f = os.path.join(sys.argv[2], f)
+            for g in file_list2:
+                g = os.path.join(sys.argv[4], g)
+                compare(f, g)
