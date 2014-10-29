@@ -1,4 +1,4 @@
-CS 4500 Assignment 4
+CS 4500 Assignment 5
 
 Tianlin Chen (chen.tia@husky.neu.edu)
 Zachary Lyford (lyford.z@husky.neu.edu)
@@ -7,24 +7,35 @@ Cody Orick (orick@ccs.neu.edu)
 
 Rapid prototype of audio matching software for the semester project. 
 
-Usage, from the assignment specification: 
+Usage, valid commands from the assignment specification: 
 
     ./dan -f <pathname> -f <pathname>
+	./dan -d <pathname> -d <pathname>
+	./dan -f <pathname> -d <pathname>
+	./dan -d <pathname> -f <pathname>
 
-where <pathname> is a Linux path name that ends in ".wav" for
-a file that already exists on the CCIS shared file system and
-is in WAVE format with CD-quality parameters (AudioFormat 1,
-stereo, 16 bits per sample, 44.1 kHz sampling rate).
+Where <pathname> following -f is either:
+1) A Linux path name that ends in ".wav" for a file that
+already exists on the CCIS shared file system and is in
+WAVE format with CD-quality parameters (AudioFormat 1,
+stereo, 16 bits per sample, 44.1 kHz sampling rate)
+2) A Linux path name that ends in ".mp3" for a file that
+already exists on the CCIS shared file system and is in
+the MPEG-1 Audio Layer III format
+
+And where <pathname> following -d is a Linux path name
+that designates a directory that exists on the CCIS
+shared file system and contains files that adhere to the
+requirements of a file following a -f option
 
 The "dan" file should be executable from the command line without any kind of
 compiling needed. If the two given files match, it will return:
 
     MATCH <file1> <file2>
 
-where the files are the short file names given in the command. If the files do
-not match, it will return:
-
-    NO MATCH
+where the files are the short file names given in the command. If a directory
+is specified, a match statement will be returned for each match recognized
+by the program.
 
 if an invalid command is given, it will return 
 
@@ -32,11 +43,15 @@ if an invalid command is given, it will return
 
 If a specified file is in an incorrect format, it will return:
 
-    ERROR: <file> is not a supported format
-    
+    ERROR: unsupported format
+
 If a file could not be opened for reasons including the file not existing:
-    
-    ERROR: <file> could not be opened
-    
+
+    ERROR: could not open file
+
+If a directory could not be opened or does not exist, it will return:
+
+	ERROR: invalid directory
+
 The program only uses libraries that are included on the CCIS Linux machines
 and does not use any third party external libraries. 
