@@ -10,9 +10,9 @@ Rapid prototype of audio matching software for the semester project.
 Usage, valid commands from the assignment specification: 
 
     ./dan -f <pathname> -f <pathname>
-	./dan -d <pathname> -d <pathname>
-	./dan -f <pathname> -d <pathname>
-	./dan -d <pathname> -f <pathname>
+    ./dan -d <pathname> -d <pathname>
+    ./dan -f <pathname> -d <pathname>
+    ./dan -d <pathname> -f <pathname>
 
 Where <pathname> following -f is either:
 1) A Linux path name that ends in ".wav" for a file that
@@ -51,7 +51,7 @@ If a file could not be opened for reasons including the file not existing:
 
 If a directory could not be opened or does not exist, it will return:
 
-	ERROR: invalid directory
+    ERROR: invalid directory
 
 The program only uses libraries that are included on the CCIS Linux machines
 and does not use any third party external libraries. 
