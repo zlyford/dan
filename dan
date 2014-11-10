@@ -55,15 +55,17 @@ def compare(path1, path2):
 
 def check_file(path):
     try:
-        filetype = magic.from_file(path)
+        m = magic.open(magic.MAGIC_SYMLINK)
+        m.load()
+        filetype = m.file(path)
         if "WAVE" in filetype:
             return "wav"
         if "layer III" in filetype:
             return "mp3"
         sys.stderr.write("ERROR: invalid file type" + filetype + "\n")
         sys.exit(-1)
-    except:
-        sys.stderr.write("ERROR: could not open file" + path + "\n")
+    except Exception as e:
+        sys.stderr.write("ERROR: could not open file " + path + "\n")
         sys.exit(-1)
 
 def normalize(path):
@@ -73,7 +75,7 @@ def normalize(path):
     if filetype == "mp3":
         command = [lame, '--decode', '--quiet', '--mp3input', '-m', 'm', '-b', '16', '--resample', '8', path, temp_path]
     else:  # wave
-        command = [lame, '--quiet', '-m', 'm', '-b', '16', '--resample', '8', path, temp_path]
+        command = [lame, '--decode', '--quiet', '-m', 'm', '-b', '16', '--resample', '8', path, temp_path]
     try:
         subprocess.check_call(command)
     except:
@@ -81,25 +83,6 @@ def normalize(path):
         sys.exit(-1)
     return wave.open(temp_path)
 
-"""
-# opens the audio file at the given location
-def open_file(path):
-    temp_file, temp_path = tempfile.mkstemp(dir='/tmp')
-    try:
-        audio = wave.open(path)
-    except Exception as e:  # it's probably an mp3, so convert it to a temp wav file
-        try:
-            subprocess.check_call([lame, '--decode', '--quiet', path, temp_path])
-        except Exception as e:
-            sys.stderr.write('ERROR: unsupported format\n')
-            sys.exit(-1)
-        try:
-            audio = wave.open(temp_path)
-        except:
-            sys.stderr.write('ERROR: could not open file\n')
-            sys.exit(-1)
-    return audio
-"""
 
 # Parse arguments
 if __name__ == '__main__':
