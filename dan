@@ -7,13 +7,14 @@ import array
 import os
 import subprocess
 import tempfile
-import magic
-
 import numpy
 
 
 # List of acceptable command "flags"
-flags = ['-f', '-d']
+FLAGS = ['-f', '-d']
+
+# acceptable file extensions
+FILE_EXTENSIONS = ['.wav', '.mp3']
 
 # lame executable location
 lame = os.path.normpath('/course/cs4500f14/bin/lame')
@@ -55,27 +56,19 @@ def compare(path1, path2):
 
 def check_file(path):
     try:
-        m = magic.open(magic.MAGIC_SYMLINK)
-        m.load()
-        filetype = m.file(path)
-        if "WAVE" in filetype:
-            return "wav"
-        if "layer III" in filetype:
-            return "mp3"
-        sys.stderr.write("ERROR: invalid file type" + filetype + "\n")
+        fileext = os.path.splitext(path)[1]
+        if fileext in FILE_EXTENSIONS:
+            return
+        sys.stderr.write("ERROR: invalid file type " + fileext + "\n")
         sys.exit(-1)
     except Exception as e:
         sys.stderr.write("ERROR: could not open file " + path + "\n")
         sys.exit(-1)
 
 def normalize(path):
-    filetype = check_file(path)
-    command = []
+    check_file(path)
     temp_file, temp_path = tempfile.mkstemp(dir='/tmp')
-    if filetype == "mp3":
-        command = [lame, '--decode', '--quiet', '--mp3input', '-m', 'm', '-b', '16', '--resample', '8', path, temp_path]
-    else:  # wave
-        command = [lame, '--decode', '--quiet', '-m', 'm', '-b', '16', '--resample', '8', path, temp_path]
+    command = [lame, '--decode', '--quiet', '-m', 'm', '-b', '16', '--resample', '8', path, temp_path]
     try:
         subprocess.check_call(command)
     except:
@@ -86,7 +79,7 @@ def normalize(path):
 
 # Parse arguments
 if __name__ == '__main__':
-    if (len(sys.argv) != 5) or (sys.argv[1] and sys.argv[3] not in flags):
+    if (len(sys.argv) != 5) or (sys.argv[1] and sys.argv[3] not in FLAGS):
         sys.stderr.write('ERROR: incorrect command line\n')
         sys.exit(-1)
     elif sys.argv[1] == '-f' and sys.argv[3] == '-f':  # both are files
