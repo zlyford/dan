@@ -40,12 +40,11 @@ def process_file(path):
     return array.array('h', byte_string)
 
 
-# Main function for comparing two audio files or directories
+# Compares two files
 def compare(path1, path2):
     a1 = process_file(path1)
     a2 = process_file(path2)
     # find the correlation matrix between them
-    # TODO: maybe find the actual length of the files before comparing
     if len(a1) == len(a2):
         corr = numpy.corrcoef(a1, a2)
         # if the files are pretty similar, return match, otherwise no match
@@ -53,6 +52,12 @@ def compare(path1, path2):
             path1 = get_short_name(path1)
             path2 = get_short_name(path2)
             print("MATCH " + path1 + " " + path2)
+
+
+def compare_lists(list1, list2):
+    for f in list1:
+        for g in list2:
+            compare(f, g)
 
 def check_file(path):
     try:
@@ -82,9 +87,14 @@ if __name__ == '__main__':
     if (len(sys.argv) != 5) or (sys.argv[1] and sys.argv[3] not in FLAGS):
         sys.stderr.write('ERROR: incorrect command line\n')
         sys.exit(-1)
-    elif sys.argv[1] == '-f' and sys.argv[3] == '-f':  # both are files
-        compare(sys.argv[2], sys.argv[4])
-        sys.exit(0)
+
+    # initialize lists of files
+    list1 = []
+    list2 = []
+
+    if sys.argv[1] == '-f' and sys.argv[3] == '-f':  # both are files
+        list1.append(sys.argv[2])
+        list2.append(sys.argv[4])
     elif sys.argv[1] == '-f' and sys.argv[3] == '-d':  # first is file, second is directory
         try:
             file_list = os.listdir(sys.argv[4])
@@ -93,8 +103,9 @@ if __name__ == '__main__':
             sys.exit(-1)
         for f in file_list:
             f = os.path.join(sys.argv[4], f)
-            compare(sys.argv[2], f)
-    elif sys.argv[1] == '-d' and sys.argv[3] == '-f':  # TODO: probably a better way of doing this
+            list2.append(f)
+        list1.append(sys.argv[2])
+    elif sys.argv[1] == '-d' and sys.argv[3] == '-f':
         try:
             file_list = os.listdir(sys.argv[2])
         except OSError:
@@ -102,7 +113,8 @@ if __name__ == '__main__':
             sys.exit(-1)
         for f in file_list:
             f = os.path.join(sys.argv[2], f)
-            compare(sys.argv[4], f)
+            list1.append(f)
+        list2.append(sys.argv[4])
     elif sys.argv[1] == '-d' and sys.argv[3] == '-d':  # both are directories
         try:
             file_list1 = os.listdir(sys.argv[2])
@@ -116,6 +128,9 @@ if __name__ == '__main__':
             sys.exit(-1)
         for f in file_list1:  # TODO: this is probably really inefficient
             f = os.path.join(sys.argv[2], f)
-            for g in file_list2:
-                g = os.path.join(sys.argv[4], g)
-                compare(f, g)
+            list1.append(f)
+        for g in file_list2:
+            g = os.path.join(sys.argv[4], g)
+            list2.append(g)
+
+    compare_lists(list1, list2)
