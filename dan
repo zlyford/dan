@@ -8,6 +8,7 @@ import os
 import subprocess
 import tempfile
 import numpy
+import atexit
 
 
 # List of acceptable command "flags"
@@ -17,10 +18,13 @@ FLAGS = ['-f', '-d']
 FILE_EXTENSIONS = ['.wav', '.mp3']
 
 # lame executable location
-lame = os.path.normpath('/course/cs4500f14/bin/lame')
+LAME = os.path.normpath('/course/cs4500f14/bin/lame')
 
 # cache of processed files/fingerprints
-cache = {}
+CACHE = {}
+
+# temp file paths/descriptors, for deleting at the end
+TEMP_FILES = []
 
 
 # Returns the short name of the file
@@ -28,16 +32,29 @@ def get_short_name(path):
     return os.path.basename(os.path.normpath(path))
 
 
+# delete temp files when finished
+@atexit.register
+def delete_temp_files():
+    for f in TEMP_FILES:
+        os.close(f[0])
+        os.remove(f[1])
+
+
 # process file for comparison; returns array of ints of the wave file samples
 def process_file(path):
-    f = normalize(path)
-    f_info = f.getparams()
-    nframes = f_info[3]
-    # reads the wave file data
-    byte_string = f.readframes(nframes)
-    f.close()
-    # convert that into an array of ints
-    return array.array('h', byte_string)
+    if path not in CACHE:
+        f = normalize(path)
+        f_info = f.getparams()
+        nframes = f_info[3]
+        # reads the wave file data
+        byte_string = f.readframes(nframes)
+        f.close()
+        # convert that into an array of ints
+        fp = array.array('h', byte_string)
+        CACHE[path] = fp  # add it to the cache
+        return fp
+    else:
+        return CACHE[path]
 
 
 # Compares two files
@@ -59,6 +76,7 @@ def compare_lists(list1, list2):
         for g in list2:
             compare(f, g)
 
+
 def check_file(path):
     try:
         fileext = os.path.splitext(path)[1]
@@ -70,15 +88,17 @@ def check_file(path):
         sys.stderr.write("ERROR: could not open file " + path + "\n")
         sys.exit(-1)
 
+
 def normalize(path):
     check_file(path)
     temp_file, temp_path = tempfile.mkstemp(dir='/tmp')
-    command = [lame, '--decode', '--quiet', '-m', 'm', '-b', '16', '--resample', '8', path, temp_path]
+    command = [LAME, '--decode', '--quiet', '-m', 'm', '-b', '16', '--resample', '8', path, temp_path]
     try:
         subprocess.check_call(command)
     except:
         sys.stderr.write('ERROR: could not normalize file\n')
         sys.exit(-1)
+    TEMP_FILES.append((temp_file, temp_path))  # add file descriptor and its path for later removal
     return wave.open(temp_path)
 
 
