@@ -1,11 +1,11 @@
-CS 4500 Assignment 5
+CS 4500 Assignment 6
 
 Tianlin Chen (chen.tia@husky.neu.edu)
 Zachary Lyford (lyford.z@husky.neu.edu)
 Michael Ng (ng.mich@husky.neu.edu)
 Cody Orick (orick@ccs.neu.edu)
 
-Rapid prototype of audio matching software for the semester project. 
+Prototype of audio matching software for the semester project.
 
 Usage, valid commands from the assignment specification: 
 
@@ -29,13 +29,15 @@ shared file system and contains files that adhere to the
 requirements of a file following a -f option
 
 The "dan" file should be executable from the command line without any kind of
-compiling needed. If the two given files match, it will return:
+compiling needed. If the two given files contain a match, it will return:
 
-    MATCH <file1> <file2>
+    MATCH <file1> <file2> <offset1> <offset2>
 
 where the files are the short file names given in the command. If a directory
 is specified, a match statement will be returned for each match recognized
-by the program.
+by the program. The two file names are followed by the offset in seconds
+of the beginning of the match in the first file and then the offset in
+seconds of the beginning of the match in the second file respectively.
 
 if an invalid command is given, it will return 
 
