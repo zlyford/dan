@@ -102,6 +102,19 @@ def normalize(path):
     return wave.open(temp_path)
 
 
+def process_directory(dir):
+    files = []
+    try:
+        file_list = os.listdir(dir)
+    except:
+        sys.stderr.write('ERROR: invalid directory\n')
+        sys.exit(-1)
+    for f in file_list:
+        f = os.path.join(dir, f)
+        files.append(f)
+    return files
+
+
 # Parse arguments
 if __name__ == '__main__':
     if (len(sys.argv) != 5) or (sys.argv[1] and sys.argv[3] not in FLAGS):
@@ -112,45 +125,13 @@ if __name__ == '__main__':
     list1 = []
     list2 = []
 
-    if sys.argv[1] == '-f' and sys.argv[3] == '-f':  # both are files
+    if sys.argv[1] == '-f':
         list1.append(sys.argv[2])
+    else:
+        list1 = process_directory(sys.argv[2])
+    if sys.argv[3] == '-f':
         list2.append(sys.argv[4])
-    elif sys.argv[1] == '-f' and sys.argv[3] == '-d':  # first is file, second is directory
-        try:
-            file_list = os.listdir(sys.argv[4])
-        except OSError:
-            sys.stderr.write('ERROR: invalid directory\n')
-            sys.exit(-1)
-        for f in file_list:
-            f = os.path.join(sys.argv[4], f)
-            list2.append(f)
-        list1.append(sys.argv[2])
-    elif sys.argv[1] == '-d' and sys.argv[3] == '-f':
-        try:
-            file_list = os.listdir(sys.argv[2])
-        except OSError:
-            sys.stderr.write('ERROR: invalid directory\n')
-            sys.exit(-1)
-        for f in file_list:
-            f = os.path.join(sys.argv[2], f)
-            list1.append(f)
-        list2.append(sys.argv[4])
-    elif sys.argv[1] == '-d' and sys.argv[3] == '-d':  # both are directories
-        try:
-            file_list1 = os.listdir(sys.argv[2])
-        except:
-            sys.stderr.write('ERROR: invalid directory\n')
-            sys.exit(-1)
-        try:
-            file_list2 = os.listdir(sys.argv[4])
-        except:
-            sys.stderr.write('ERROR: invalid directory\n')
-            sys.exit(-1)
-        for f in file_list1:  # TODO: this is probably really inefficient
-            f = os.path.join(sys.argv[2], f)
-            list1.append(f)
-        for g in file_list2:
-            g = os.path.join(sys.argv[4], g)
-            list2.append(g)
+    else:
+        list2 = process_directory(sys.argv[4])
 
     compare_lists(list1, list2)
