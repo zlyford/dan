@@ -3,6 +3,7 @@
 # for some reason numpy is not installed for python 3 on the CCIS machines...
 import sys
 import wave
+import audioop
 import array
 import os
 import subprocess
@@ -51,6 +52,8 @@ def process_file(path):
         f.close()
         # convert that into an array of ints
         fp = array.array('h', byte_string)
+        # do fft stuff (can't do the whole file since it takes too much time/space & won't work for segments)
+        #fp = numpy.fft.rfft(fp)
         CACHE[path] = fp  # add it to the cache
         return fp
     else:
@@ -89,17 +92,38 @@ def check_file(path):
         sys.exit(-1)
 
 
+"""
+Normalizes audio files; converts them to wav, mono, 16000 sample rate as a temp file in /tmp/
+Returns: opened wave file (closed later in process_file())
+"""
 def normalize(path):
     check_file(path)
     temp_file, temp_path = tempfile.mkstemp(dir='/tmp')
-    command = [LAME, '--decode', '--quiet', '-m', 'm', '-b', '16', '--resample', '8', path, temp_path]
+    command = [LAME, '--decode', '--quiet', '--resample', '16', '-m', 'm', '-b', '16', path, temp_path]
     try:
         subprocess.check_call(command)
     except:
         sys.stderr.write('ERROR: could not normalize file\n')
         sys.exit(-1)
-    TEMP_FILES.append((temp_file, temp_path))  # add file descriptor and its path for later removal
-    return wave.open(temp_path)
+    # re-normalize it because lame doesn't actually do anything with a wav file
+    f = wave.open(temp_path)
+    nframes = f.getnframes()
+    nchannels = f.getnchannels()
+    frames = f.readframes(nframes)
+    f.close()
+
+    temp_file2, temp_path2 = tempfile.mkstemp(dir='/tmp')
+    wavefile = wave.open(temp_path2, 'wb')
+    wavefile.setparams((1, 2, 16000, nframes, 'NONE', 'NONE'))
+    if nchannels != 1:
+        frames = audioop.tomono(frames, 2, 1, 1)
+    wavefile.writeframes(frames)
+    wavefile.close()
+    os.close(temp_file)
+    os.remove(temp_path)
+
+    TEMP_FILES.append((temp_file2, temp_path2))  # add file descriptor and its path for later removal
+    return wave.open(temp_path2)
 
 
 def process_directory(dir):
