@@ -50,14 +50,17 @@ def process_file(path):
         # reads the wave file data
         byte_string = f.readframes(nframes)
         f.close()
-        # convert that into an array of ints
-        fp = array.array('h', byte_string)
-        # do fft stuff (can't do the whole file since it takes too much time/space & won't work for segments)
-        #fp = numpy.fft.rfft(fp)
+        # make fingerprint
+        fp = fingerprint(byte_string)
         CACHE[path] = fp  # add it to the cache
         return fp
     else:
         return CACHE[path]
+
+
+def fingerprint(audio):
+    fp = array.array('h', audio)
+    return fp
 
 
 # Compares two files
