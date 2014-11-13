@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-# for some reason numpy is not installed for python 3 on the CCIS machines...
 import sys
 import wave
 import audioop
