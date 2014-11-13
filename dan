@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 import numpy
 import atexit
+import operator
 
 
 # List of acceptable command "flags"
@@ -60,7 +61,15 @@ def process_file(path):
 
 def fingerprint(audio):
     fp = array.array('h', audio)
-    return fp
+    chunksize = 2048
+    chunks = []
+    for i in range(0, len(fp), chunksize):
+        chunks.append(abs(numpy.fft.rfft(fp[i:i+chunksize])))
+    chunks2 = []
+    for i in chunks:
+        chunks2.append([max(enumerate(i[x[0]:x[1]], x[0]), key=operator.itemgetter(1)) for x in ((40, 80), (80, 120), (120, 180), (180, 300))])
+    print chunks2
+    return chunks2
 
 
 # Compares two files
