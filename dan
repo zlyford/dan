@@ -45,6 +45,7 @@ def delete_temp_files():
 def process_file(path):
     if path not in CACHE:
         f = normalize(path)
+        f = wave.open(f)
         f_info = f.getparams()
         nframes = f_info[3]
         # reads the wave file data
@@ -97,7 +98,7 @@ def check_file(path):
 
 """
 Normalizes audio files; converts them to wav, mono, 16000 sample rate as a temp file in /tmp/
-Returns: opened wave file (closed later in process_file())
+Returns: path of the wave file
 """
 def normalize(path):
     check_file(path)
@@ -126,7 +127,7 @@ def normalize(path):
     os.remove(temp_path)
 
     TEMP_FILES.append((temp_file2, temp_path2))  # add file descriptor and its path for later removal
-    return wave.open(temp_path2)
+    return temp_path2
 
 
 def process_directory(dir):
