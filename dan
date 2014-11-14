@@ -9,7 +9,9 @@ import subprocess
 import tempfile
 import numpy
 import atexit
-import operator
+from operator import itemgetter
+import scipy.io.wavfile
+import math
 
 
 # List of acceptable command "flags"
@@ -45,31 +47,26 @@ def delete_temp_files():
 def process_file(path):
     if path not in CACHE:
         f = normalize(path)
-        f = wave.open(f)
-        f_info = f.getparams()
-        nframes = f_info[3]
-        # reads the wave file data
-        byte_string = f.readframes(nframes)
-        f.close()
         # make fingerprint
-        fp = fingerprint(byte_string)
+        fp = fingerprint(f)
         CACHE[path] = fp  # add it to the cache
         return fp
     else:
         return CACHE[path]
 
 
-def fingerprint(audio):
-    fp = array.array('h', audio)
-    chunksize = 2048
-    chunks = []
-    for i in range(0, len(fp), chunksize):
-        chunks.append(abs(numpy.fft.rfft(fp[i:i+chunksize])))
-    chunks2 = []
-    for i in chunks:
-        chunks2.append([max(enumerate(i[x[0]:x[1]], x[0]), key=operator.itemgetter(1)) for x in ((40, 80), (80, 120), (120, 180), (180, 300))])
-    print chunks2
-    return chunks2
+def fingerprint(path):
+    fp = []
+    wf = wave.open(path)
+    nframes = wf.getnframes()
+    rate, data = scipy.io.wavfile.read(path)
+    chunksize = rate / 10
+    for i in range(0, nframes, chunksize):
+        chunk = data[i:i+chunksize]
+        fft = [abs(j) for j in numpy.fft.rfft(chunk)]
+        result = max(enumerate(fft), key=itemgetter(1))[0] * rate / len(chunk)
+        fp.append(result)
+    return fp
 
 
 # Compares two files
@@ -79,8 +76,9 @@ def compare(path1, path2):
     # find the correlation matrix between them
     if len(a1) == len(a2):
         corr = numpy.corrcoef(a1, a2)
+        #print path1 + " " + path2 + " " + str(corr[0][1])
         # if the files are pretty similar, return match, otherwise no match
-        if corr[0][1] > 0.9:
+        if corr[0][1] > 0.7:
             path1 = get_short_name(path1)
             path2 = get_short_name(path2)
             print("MATCH " + path1 + " " + path2)
